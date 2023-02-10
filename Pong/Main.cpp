@@ -16,10 +16,6 @@ bool running = false;
 int frameCount, timerFPS, thisFrame, lastFrame, fps;
 float deltaTime;
 
-//Declare objects
-//SDL_Rect leftPaddle, rightPaddle, ball;
-//float velocityY, velocityX;
-
 LeftPaddle leftPaddle;
 RightPaddle rightPaddle;
 Ball ball;
@@ -48,25 +44,36 @@ void CollisionCheck()
 	}
 }
 
-bool DidItMove(float previousPosition)
+int DidItMove(float previousPosition)
 {
-	if (leftPaddle.Yposition > previousPosition || leftPaddle.Yposition < previousPosition)
+	if (leftPaddle.Yposition > previousPosition)
 	{
-		return true;
+		return -1;
 	}
-	return false;
+	else if (leftPaddle.Yposition < previousPosition)
+	{
+		return 1;
+	}
+	return 0;
 }
 
 void Update()
 {
 	float previousPosition = leftPaddle.Yposition;
+	int modifiedYPosition = (int)leftPaddle.Yposition;
 	//Constraint = Upper:90, Lower:810
-	if (keyDown.moveToPosition)
+	if (keyDown.mouseMoving)
 	{
-		keyDown.moveToPosition = false;
+		keyDown.mouseMoving = false;
+
+		//previous position is now current position
 		previousPosition = leftPaddle.Yposition;
-		SDL_GetMouseState(NULL, &leftPaddle.leftPaddle.y);
-		leftPaddle.Yposition = leftPaddle.leftPaddle.y;
+
+		//setting modifiedYPosition to current mouse position
+		SDL_GetMouseState(NULL, &modifiedYPosition);
+
+		//Base position is now the modified position
+		leftPaddle.Yposition = modifiedYPosition;
 	}
 	/*MOVEMENT PHYSICS ON BUTTON PRESS
 	TODO: Get direction mouse was moved in to apply physics to mouse movement*/
@@ -74,13 +81,16 @@ void Update()
 	//if (keyDown.sPressed) { leftPaddle.incrimentAcceleration('-'); }
 	//leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
 	//leftPaddle.acceleration = 0.f;
-	if (DidItMove(previousPosition)) { leftPaddle.incrimentAcceleration('+'); }
-	if (DidItMove(previousPosition)) { leftPaddle.incrimentAcceleration('-'); }
+
+	//Apply physics
+	if (DidItMove(previousPosition) == 1) { leftPaddle.incrimentAcceleration('+'); }
+	if (DidItMove(previousPosition) == -1) { leftPaddle.incrimentAcceleration('-'); }
 	leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
 	leftPaddle.acceleration = 0.f;
 
-	CollisionCheck();
+	//Apply value to ACTUAL position
 	leftPaddle.leftPaddle.y = leftPaddle.Yposition;
+	CollisionCheck();
 	debugInfo();
 }
 
@@ -134,7 +144,7 @@ void Input()
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			keyDown.moveToPosition = true;
+			keyDown.mouseMoving = true;
 			break;
 		default:
 			break;

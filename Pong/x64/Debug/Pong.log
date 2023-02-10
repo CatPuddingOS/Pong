@@ -1,12 +1,10 @@
-﻿  classes.cpp
-  Main.cpp
+﻿  Main.cpp
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(39,40): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(43,40): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(47,40): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(69,47): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(83,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(158,30): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(191,64): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(191,49): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(210,29): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
-  Generating Code...
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(76,26): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(92,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(168,30): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(201,64): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(201,49): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(220,29): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
   Pong.vcxproj -> C:\Users\Devin\source\repos\Pong\x64\Debug\Pong.exe

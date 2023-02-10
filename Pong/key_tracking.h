@@ -6,5 +6,5 @@ struct Keytracker
 	bool upPressed = false;
 	bool downPressed = false;
 
-	bool moveToPosition = false;
+	bool mouseMoving = false;
 };
