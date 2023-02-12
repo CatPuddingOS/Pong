@@ -5,28 +5,18 @@ class Paddle
 public:
 	float verticalHalfSize; //HalfSize also relates to TOTAL height in our case
 	float Xposition, Yposition;
+	float previousYPosition, modifiedYPosition;
 	float Xvelocity, Yvelocity;
 	float acceleration;
+	SDL_Rect paddle;
 
 	void incrimentAcceleration(char); //direction takes either + or -
 	float getXposition();
 	float getYposition();
-	float movePaddle(float, float);
+	void movePaddle(float, float);
 	void HandleContactingWall(int);
 
 	void printMovementValues();
-};
-
-class LeftPaddle : public Paddle
-{
-public:
-	SDL_Rect leftPaddle;
-};
-
-class RightPaddle : public Paddle
-{
-public:
-	SDL_Rect rightPaddle;
 };
 
 class Ball

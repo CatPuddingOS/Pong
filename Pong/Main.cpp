@@ -15,9 +15,11 @@ Keytracker keyDown;
 bool running = false;
 int frameCount, timerFPS, thisFrame, lastFrame, fps;
 float deltaTime;
+float previousYPosition = 0.f;
+int modifiedYPosition = 0;
 
-LeftPaddle leftPaddle;
-RightPaddle rightPaddle;
+Paddle leftPaddle;
+Paddle rightPaddle;
 Ball ball;
 Court court;
 
@@ -25,8 +27,6 @@ void debugInfo()
 {
 	std::cout << "Left Paddle Values: ";
 	leftPaddle.printMovementValues();
-	std::cout << "Right Paddle Values: ";
-	rightPaddle.printMovementValues();
 	std::cout << std::endl;
 }
 
@@ -44,54 +44,52 @@ void CollisionCheck()
 	}
 }
 
-int DidItMove(float previousPosition)
+//This corrects the mouses relative position if it strays from the play area. Keeps paddle motion stable
+void correctRelativeBoundary()
 {
-	if (leftPaddle.Yposition > previousPosition)
+	if (modifiedYPosition > 815)
 	{
-		return -1;
+		modifiedYPosition = 815;
 	}
-	else if (leftPaddle.Yposition < previousPosition)
+	if (modifiedYPosition < 90)
 	{
-		return 1;
+		modifiedYPosition = 90;
 	}
-	return 0;
 }
 
 void Update()
 {
-	float previousPosition = leftPaddle.Yposition;
-	int modifiedYPosition = (int)leftPaddle.Yposition;
-	//Constraint = Upper:90, Lower:810
 	if (keyDown.mouseMoving)
 	{
 		keyDown.mouseMoving = false;
-
-		//previous position is now current position
-		previousPosition = leftPaddle.Yposition;
-
-		//setting modifiedYPosition to current mouse position
-		SDL_GetMouseState(NULL, &modifiedYPosition);
-
-		//Base position is now the modified position
-		leftPaddle.Yposition = modifiedYPosition;
 	}
 	/*MOVEMENT PHYSICS ON BUTTON PRESS
-	TODO: Get direction mouse was moved in to apply physics to mouse movement*/
 	//if (keyDown.wPressed) { leftPaddle.incrimentAcceleration('+'); }
 	//if (keyDown.sPressed) { leftPaddle.incrimentAcceleration('-'); }
 	//leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
-	//leftPaddle.acceleration = 0.f;
+	//leftPaddle.acceleration = 0.f;*/
 
-	//Apply physics
-	if (DidItMove(previousPosition) == 1) { leftPaddle.incrimentAcceleration('+'); }
-	if (DidItMove(previousPosition) == -1) { leftPaddle.incrimentAcceleration('-'); }
+	//Unedited position
+	leftPaddle.Yposition = (float)modifiedYPosition;
+
+	/*MOVEMENT PHYSICS ON MOUSEMOVE*/
+	if (previousYPosition < modifiedYPosition) { leftPaddle.incrimentAcceleration('+'); }
+	if (previousYPosition > modifiedYPosition) { leftPaddle.incrimentAcceleration('-'); }
+	previousYPosition = modifiedYPosition;
+
 	leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
-	leftPaddle.acceleration = 0.f;
-
-	//Apply value to ACTUAL position
-	leftPaddle.leftPaddle.y = leftPaddle.Yposition;
+	leftPaddle.acceleration = 0;
+	
 	CollisionCheck();
-	debugInfo();
+
+	//Apply edited Yposition
+	leftPaddle.paddle.y = leftPaddle.Yposition;
+	correctRelativeBoundary();
+
+
+
+	/*std::cout << "Relative Info: " << modifiedYPosition << " " << previousYPosition << " ";
+	debugInfo();*/
 }
 
 void MouseInput()
@@ -145,6 +143,8 @@ void Input()
 			break;
 		case SDL_MOUSEMOTION:
 			keyDown.mouseMoving = true;
+			modifiedYPosition += e.motion.yrel;
+			e.motion.yrel -= e.motion.yrel;
 			break;
 		default:
 			break;
@@ -174,8 +174,8 @@ void Render()
 	//Colorize Viewport (Queue)
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 
-	SDL_RenderFillRect(renderer, &leftPaddle.leftPaddle);
-	SDL_RenderFillRect(renderer, &rightPaddle.rightPaddle);
+	SDL_RenderFillRect(renderer, &leftPaddle.paddle);
+	SDL_RenderFillRect(renderer, &rightPaddle.paddle);
 	SDL_RenderFillRect(renderer, &ball.ball);
 
 	//Present Renering (Draw)
@@ -191,14 +191,20 @@ int main(int argc, char* argv[])
 	running = true;
 	static int lastTime = 0;
 
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+	SDL_Event event;
+	event.type = SDL_MOUSEMOTION;
+	event.motion.yrel = HEIGHT / 2 - (leftPaddle.paddle.h / 2);
+	SDL_PushEvent(&event);
+
 	//Create color (white)
 	color.r = color.g = color.b = 255;
 
-	leftPaddle.leftPaddle.w = 15;
-	leftPaddle.leftPaddle.h = HEIGHT / 6;
+	leftPaddle.paddle.w = 15;
+	leftPaddle.paddle.h = HEIGHT / 6;
 	leftPaddle.verticalHalfSize = HEIGHT / 12;
-	leftPaddle.leftPaddle.x = 100;
-	leftPaddle.leftPaddle.y = leftPaddle.Yposition = (HEIGHT / 2) - (leftPaddle.leftPaddle.h / 2);
+	leftPaddle.paddle.x = 100;
+	leftPaddle.paddle.y = leftPaddle.Yposition = (HEIGHT / 2) - (leftPaddle.paddle.h / 2);
 
 	/*rightPaddle.rightPaddle.w = 15;
 	rightPaddle.rightPaddle.h = HEIGHT / 6;

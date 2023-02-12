@@ -5,9 +5,9 @@
 inline void Paddle::incrimentAcceleration(char direction)
 {
 	if (direction == '+')
-		acceleration -= 15000.f;
+		acceleration -= 5000.f;
 	else if (direction == '-')
-		acceleration += 15000.f;
+		acceleration += 5000.f;
 };
 inline float Paddle::getXposition()
 {
@@ -17,13 +17,11 @@ inline float Paddle::getYposition()
 {
 	return Yposition;
 };
-inline float Paddle::movePaddle(float delta, float accel)
+inline void Paddle::movePaddle(float delta, float accel)
 {
 	acceleration -= Yvelocity * 10.f;
 	Yposition += (Yvelocity * delta) + (acceleration * delta * delta * .5f);
 	Yvelocity += acceleration * delta;
-
-	return Yposition;
 }
 inline void Paddle::HandleContactingWall(int collisionArea)
 {
@@ -31,7 +29,7 @@ inline void Paddle::HandleContactingWall(int collisionArea)
 	{
 		Yposition = collisionArea - verticalHalfSize;
 	}
-	else
+	else if (collisionArea <= 5)
 	{
 		Yposition = collisionArea + verticalHalfSize;
 	}
