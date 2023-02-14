@@ -18,7 +18,7 @@
     <ClInclude Include="classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="key_tracking.h">
+    <ClInclude Include="input_tracker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

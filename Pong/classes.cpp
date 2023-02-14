@@ -19,6 +19,17 @@ inline float Paddle::getYposition()
 };
 inline void Paddle::movePaddle(float delta, float accel)
 {
+	/*Paddle motion(slide physics) could be calculated relative to MOUSE displacement
+	  rather than a predefined acceleration
+		-Acceleration would still play a part but the actual distance the mouse travels in
+		 (delta) seconds would play into acceleration*/
+	
+	/*				useful computations
+		Vel = A / D
+		Accel = V / D
+		Displace = V * D + ((.5) * A * pow(D, 2))
+	*/
+
 	acceleration -= Yvelocity * 10.f;
 	Yposition += (Yvelocity * delta) + (acceleration * delta * delta * .5f);
 	Yvelocity += acceleration * delta;

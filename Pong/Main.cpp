@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include <iostream>
 #include "classes.cpp"
-#include "key_tracking.h"
+#include "input_tracker.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080
@@ -11,18 +11,24 @@
 SDL_Renderer* renderer;
 SDL_Window* window;
 SDL_Color color;
-Keytracker keyDown;
+InputTracker hasInput;
 bool running = false;
+
+/*frameCount to delta  could probably be in s struct or class somewhere*/
 int frameCount, timerFPS, thisFrame, lastFrame, fps;
 float deltaTime;
+
+/*previous and modified potsition need to be in a class as: pervious and new*/
 float previousYPosition = 0.f;
 int modifiedYPosition = 0;
 
+/*Objects must stay for now*/
 Paddle leftPaddle;
 Paddle rightPaddle;
 Ball ball;
 Court court;
 
+/*---DEBUG---*/
 void debugInfo()
 {
 	std::cout << "Left Paddle Values: ";
@@ -44,7 +50,7 @@ void CollisionCheck()
 	}
 }
 
-//This corrects the mouses relative position if it strays from the play area. Keeps paddle motion stable
+//This corrects the mouses' relative position if it strays from the play area. Keeps paddle motion stable
 void correctRelativeBoundary()
 {
 	if (modifiedYPosition > 815)
@@ -59,9 +65,9 @@ void correctRelativeBoundary()
 
 void Update()
 {
-	if (keyDown.mouseMoving)
+	if (hasInput.mouseMoving)
 	{
-		keyDown.mouseMoving = false;
+		hasInput.mouseMoving = false;
 	}
 	/*MOVEMENT PHYSICS ON BUTTON PRESS
 	//if (keyDown.wPressed) { leftPaddle.incrimentAcceleration('+'); }
@@ -126,8 +132,8 @@ void Input()
 		case SDL_KEYDOWN:
 			switch (e.key.keysym.sym)
 			{
-			case SDLK_w:	keyDown.wPressed = true; break;
-			case SDLK_s:	keyDown.sPressed = true; break;
+			case SDLK_w:	hasInput.wPressed = true; break;
+			case SDLK_s:	hasInput.sPressed = true; break;
 			default:
 				break;
 			}
@@ -135,14 +141,14 @@ void Input()
 		case SDL_KEYUP:
 			switch (e.key.keysym.sym)
 			{
-			case SDLK_w:	keyDown.wPressed = false; break;
-			case SDLK_s:	keyDown.sPressed = false; break;
+			case SDLK_w:	hasInput.wPressed = false; break;
+			case SDLK_s:	hasInput.sPressed = false; break;
 			default:
 				break;
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			keyDown.mouseMoving = true;
+			hasInput.mouseMoving = true;
 			modifiedYPosition += e.motion.yrel;
 			e.motion.yrel -= e.motion.yrel;
 			break;
