@@ -10,7 +10,7 @@ public:
 	float acceleration;
 	SDL_Rect paddle;
 
-	void CalculateAcceleration(float, float, float); //direction takes either + or -
+	void CalculateAcceleration(float, float, float);
 	float getXposition();
 	float getYposition();
 	void MovePaddle(float, float);

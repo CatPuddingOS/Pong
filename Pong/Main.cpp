@@ -14,7 +14,7 @@ SDL_Color color;
 InputTracker hasInput;
 bool running = false;
 
-/*frameCount to delta  could probably be in struct or class somewhere*/
+/*frameCount to delta could probably be in struct or class somewhere*/
 int frameCount, timerFPS, thisFrame, lastFrame, fps;
 float deltaTime;
 
@@ -85,7 +85,7 @@ void Update()
 
 	leftPaddle.MovePaddle(deltaTime, leftPaddle.acceleration);
 	CollisionCheck();
-	leftPaddle.acceleration = 0;
+	leftPaddle.acceleration = 0.f;
 
 	//Apply edited Yposition to rendered paddle
 	leftPaddle.paddle.y = leftPaddle.Yposition;
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 	SDL_Event event;
 	event.type = SDL_MOUSEMOTION;
-	event.motion.yrel = HEIGHT / 2 - (leftPaddle.paddle.h / 2);
+	leftPaddle.Yposition = event.motion.yrel = HEIGHT / 3; //Helping to create an illusion of falling from the top on spawn
 	SDL_PushEvent(&event);
 
 	//Create color (white)
@@ -203,7 +203,8 @@ int main(int argc, char* argv[])
 	leftPaddle.paddle.h = HEIGHT / 6;
 	leftPaddle.verticalHalfSize = HEIGHT / 12;
 	leftPaddle.paddle.x = 100;
-	leftPaddle.paddle.y = leftPaddle.Yposition = (HEIGHT / 2) - (leftPaddle.paddle.h / 2);
+	leftPaddle.paddle.y = leftPaddle.Yposition;
+	// leftPaddle.paddle.y = leftPaddle.Yposition = (HEIGHT / 2) + leftPaddle.paddle.h;
 
 	/*rightPaddle.rightPaddle.w = 15;
 	rightPaddle.rightPaddle.h = HEIGHT / 6;
