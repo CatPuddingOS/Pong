@@ -11,12 +11,9 @@
 SDL_Renderer* renderer;
 SDL_Window* window;
 SDL_Color color;
+DeltaFrames deltaFrame;
 InputTracker hasInput;
 bool running = false;
-
-/*frameCount to delta could probably be in struct or class somewhere*/
-int frameCount, timerFPS, thisFrame, lastFrame, fps;
-float deltaTime;
 
 /*previous and modified potsition need to be in a class as: pervious and new*/
 float previousYPosition = 0.f;
@@ -80,10 +77,11 @@ void Update()
 	leftPaddle.Yposition = (float)modifiedYPosition;
 
 	/*MOVEMENT PHYSICS ON MOUSEMOVE*/
-	leftPaddle.CalculateAcceleration(modifiedYPosition, previousYPosition, deltaTime);
+	leftPaddle.CalculateAcceleration(modifiedYPosition, previousYPosition, deltaFrame.deltaTime);
 	previousYPosition = modifiedYPosition;
 
-	leftPaddle.MovePaddle(deltaTime, leftPaddle.acceleration);
+	//Move the paddle to its next Y position
+	leftPaddle.MovePaddle(deltaFrame.deltaTime, leftPaddle.acceleration);
 	CollisionCheck();
 	leftPaddle.acceleration = 0.f;
 
@@ -163,12 +161,8 @@ void Render()
 	SDL_RenderClear(renderer);
 
 	//Recheck Frame Count (Delta)
-	frameCount++;
-	timerFPS = SDL_GetTicks64() - lastFrame;
-	if (timerFPS < (1000 / 60))
-	{
-		SDL_Delay((1000 / 60) - timerFPS);
-	}
+	deltaFrame.SetNextTimerFPS();
+	deltaFrame.FPSThrottle();
 
 	//Colorize Viewport (Queue)
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
@@ -223,19 +217,14 @@ int main(int argc, char* argv[])
 
 	while (running)
 	{
-		lastFrame = SDL_GetTicks64();
-		if (lastFrame >= (lastTime + 1000))
-		{
-			lastTime = lastFrame;
-		}
+		deltaFrame.CheckNewFrame(lastTime);
 
 		Update();
 		Input();
 		//MouseInput();
 		Render();
 
-		deltaTime = (SDL_GetTicks() - lastFrame) / 1000.f;
-		//deltaTime = (float)((SDL_GetTicks64() - lastFrame) * 1000.f / (float)SDL_GetPerformanceFrequency());
+		deltaFrame.CalculateDelta();
 	}
 
 	SDL_DestroyRenderer(renderer);

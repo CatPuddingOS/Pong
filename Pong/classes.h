@@ -36,3 +36,17 @@ class Court
 public:
 	float topBoundary, bottomBoundary, leftBoundary, rightBoundary;
 };
+
+class DeltaFrames
+{
+public:
+	//intergers are resulting in shitty delta calculations but whatever
+	int frameCount, timerFPS, thisFrame, lastFrame, fps;
+	float deltaTime;
+
+	void CalculateDelta();
+	void CheckNewFrame(int);
+	void SetNextTimerFPS();
+	void FPSThrottle();
+
+};

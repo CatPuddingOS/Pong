@@ -42,3 +42,31 @@ inline void Paddle::printMovementValues()
 {
 	std::cout << "A: " << acceleration << " # # # V: " << Yvelocity << " # # # P: " << Yposition << " | ";
 }
+
+inline void DeltaFrames::CalculateDelta()
+{
+	deltaTime = (SDL_GetTicks() - lastFrame) / 1000.f;
+}
+inline void DeltaFrames::CheckNewFrame(int lastTime)
+{
+	lastFrame = SDL_GetTicks64();
+	if (lastFrame >= (lastTime + 1000))
+	{
+		lastTime = lastFrame;
+	}
+}
+//Works independently of delta time to check time between frames
+inline void DeltaFrames::SetNextTimerFPS()
+{
+	timerFPS = SDL_GetTicks64() - lastFrame;
+}
+//Throttles fps via predefined delay
+inline void DeltaFrames::FPSThrottle()
+{
+	frameCount++;
+	
+	if (timerFPS < (1000 / 60))
+	{
+		SDL_Delay((1000 / 60) - timerFPS);
+	}
+}
