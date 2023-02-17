@@ -14,7 +14,7 @@ SDL_Color color;
 InputTracker hasInput;
 bool running = false;
 
-/*frameCount to delta  could probably be in s struct or class somewhere*/
+/*frameCount to delta  could probably be in struct or class somewhere*/
 int frameCount, timerFPS, thisFrame, lastFrame, fps;
 float deltaTime;
 
@@ -51,7 +51,7 @@ void CollisionCheck()
 }
 
 //This corrects the mouses' relative position if it strays from the play area. Keeps paddle motion stable
-void correctRelativeBoundary()
+void CorrectRelativeBoundary()
 {
 	if (modifiedYPosition > 815)
 	{
@@ -65,39 +65,37 @@ void correctRelativeBoundary()
 
 void Update()
 {
-	if (hasInput.mouseMoving)
+	if (hasInput.mouseMoving && previousYPosition == modifiedYPosition)
 	{
 		hasInput.mouseMoving = false;
 	}
+	
 	/*MOVEMENT PHYSICS ON BUTTON PRESS
 	//if (keyDown.wPressed) { leftPaddle.incrimentAcceleration('+'); }
 	//if (keyDown.sPressed) { leftPaddle.incrimentAcceleration('-'); }
 	//leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
 	//leftPaddle.acceleration = 0.f;*/
 
-	//Unedited position
+	//Position with no values applied
 	leftPaddle.Yposition = (float)modifiedYPosition;
 
 	/*MOVEMENT PHYSICS ON MOUSEMOVE*/
-	if (previousYPosition < modifiedYPosition) { leftPaddle.incrimentAcceleration('+'); }
-	if (previousYPosition > modifiedYPosition) { leftPaddle.incrimentAcceleration('-'); }
+	leftPaddle.CalculateAcceleration(modifiedYPosition, previousYPosition, deltaTime);
 	previousYPosition = modifiedYPosition;
 
-	leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
-	leftPaddle.acceleration = 0;
-	
+	leftPaddle.MovePaddle(deltaTime, leftPaddle.acceleration);
 	CollisionCheck();
+	leftPaddle.acceleration = 0;
 
-	//Apply edited Yposition
+	//Apply edited Yposition to rendered paddle
 	leftPaddle.paddle.y = leftPaddle.Yposition;
-	correctRelativeBoundary();
+	CorrectRelativeBoundary();
 
-
-
-	/*std::cout << "Relative Info: " << modifiedYPosition << " " << previousYPosition << " ";
-	debugInfo();*/
+	//std::cout << "Relative Info: " << modifiedYPosition << " " << previousYPosition << " ";
+	//debugInfo();
 }
 
+/*Probably gonna use this later*/
 void MouseInput()
 {
 	SDL_Event e;
@@ -126,16 +124,13 @@ void Input()
 	{
 		switch (e.type)
 		{
-		case SDL_QUIT:
-			running = false;
-			break;
+		case SDL_QUIT:	running = false; break;
 		case SDL_KEYDOWN:
 			switch (e.key.keysym.sym)
 			{
 			case SDLK_w:	hasInput.wPressed = true; break;
 			case SDLK_s:	hasInput.sPressed = true; break;
-			default:
-				break;
+			default:	break;
 			}
 			break;
 		case SDL_KEYUP:
@@ -143,8 +138,7 @@ void Input()
 			{
 			case SDLK_w:	hasInput.wPressed = false; break;
 			case SDLK_s:	hasInput.sPressed = false; break;
-			default:
-				break;
+			default:	break;
 			}
 			break;
 		case SDL_MOUSEMOTION:
@@ -152,8 +146,7 @@ void Input()
 			modifiedYPosition += e.motion.yrel;
 			e.motion.yrel -= e.motion.yrel;
 			break;
-		default:
-			break;
+		default:	break;
 		}
 
 		if (keyStates[SDL_SCANCODE_ESCAPE])
