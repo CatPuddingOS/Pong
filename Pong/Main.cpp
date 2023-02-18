@@ -16,12 +16,14 @@ InputTracker hasInput;
 bool running = false;
 
 /*previous and modified potsition need to be in a class as: pervious and new*/
-float previousYPosition = 0.f;
-int modifiedYPosition = 0;
+//float previousYPosition = 0.f;
+//int modifiedYPosition = 0;
 
 /*Objects must stay for now*/
 Paddle leftPaddle;
 Paddle rightPaddle;
+//Array of all paddle objects 
+Paddle paddles[] = {leftPaddle, rightPaddle};
 Ball ball;
 Court court;
 
@@ -48,21 +50,21 @@ void CollisionCheck()
 }
 
 //This corrects the mouses' relative position if it strays from the play area. Keeps paddle motion stable
-void CorrectRelativeBoundary()
+void CorrectRelativeBoundary(Paddle &paddle)
 {
-	if (modifiedYPosition > 815)
+	if (paddle.modifiedYPosition > 815)
 	{
-		modifiedYPosition = 815;
+		paddle.modifiedYPosition = 815;
 	}
-	if (modifiedYPosition < 90)
+	if (paddle.modifiedYPosition < 90)
 	{
-		modifiedYPosition = 90;
+		paddle.modifiedYPosition = 90;
 	}
 }
 
 void Update()
 {
-	if (hasInput.mouseMoving && previousYPosition == modifiedYPosition)
+	if (hasInput.mouseMoving && leftPaddle.previousYPosition == leftPaddle.modifiedYPosition)
 	{
 		hasInput.mouseMoving = false;
 	}
@@ -73,22 +75,26 @@ void Update()
 	//leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
 	//leftPaddle.acceleration = 0.f;*/
 
-	//Position with no values applied
-	leftPaddle.Yposition = (float)modifiedYPosition;
+	
+	
 
-	/*MOVEMENT PHYSICS ON MOUSEMOVE*/
-	leftPaddle.CalculateAcceleration(modifiedYPosition, previousYPosition, deltaFrame.deltaTime);
-	previousYPosition = modifiedYPosition;
+	/*LEFT PADDLE MOVEMENT*/
+	//Position with no values applied
+	leftPaddle.Yposition = (float)leftPaddle.modifiedYPosition;
+
+	/*Physics calculations*/
+	leftPaddle.CalculateAcceleration(leftPaddle.modifiedYPosition, leftPaddle.previousYPosition, deltaFrame.deltaTime);
+	leftPaddle.previousYPosition = leftPaddle.modifiedYPosition;
 
 	//Move the paddle to its next Y position
 	leftPaddle.MovePaddle(deltaFrame.deltaTime, leftPaddle.acceleration);
 	CollisionCheck();
-	leftPaddle.acceleration = 0.f;
 
 	//Apply edited Yposition to rendered paddle
 	leftPaddle.paddle.y = leftPaddle.Yposition;
-	CorrectRelativeBoundary();
-
+	CorrectRelativeBoundary(leftPaddle);
+	leftPaddle.acceleration /= leftPaddle.buoyancy;
+	
 	//std::cout << "Relative Info: " << modifiedYPosition << " " << previousYPosition << " ";
 	//debugInfo();
 }
@@ -141,7 +147,7 @@ void Input()
 			break;
 		case SDL_MOUSEMOTION:
 			hasInput.mouseMoving = true;
-			modifiedYPosition += e.motion.yrel;
+			leftPaddle.modifiedYPosition += e.motion.yrel;
 			e.motion.yrel -= e.motion.yrel;
 			break;
 		default:	break;
@@ -187,7 +193,7 @@ int main(int argc, char* argv[])
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 	SDL_Event event;
 	event.type = SDL_MOUSEMOTION;
-	leftPaddle.Yposition = event.motion.yrel = HEIGHT / 3; //Helping to create an illusion of falling from the top on spawn
+	leftPaddle.Yposition = rightPaddle.Yposition = event.motion.yrel = HEIGHT / 3; //Helping to create an illusion of falling from the top on spawn
 	SDL_PushEvent(&event);
 
 	//Create color (white)
@@ -200,11 +206,12 @@ int main(int argc, char* argv[])
 	leftPaddle.paddle.y = leftPaddle.Yposition;
 	// leftPaddle.paddle.y = leftPaddle.Yposition = (HEIGHT / 2) + leftPaddle.paddle.h;
 
-	/*rightPaddle.rightPaddle.w = 15;
-	rightPaddle.rightPaddle.h = HEIGHT / 6;
-	ritghPaddle.verticalHalfSize = HEIGHT / 12;
-	rightPaddle.rightPaddle.x = WIDTH - 100;
-	rightPaddle.rightPaddle.y = rightPaddle.Yposition = (HEIGHT / 2) - (rightPaddle.rightPaddle.h / 2)*/;
+	rightPaddle.paddle.w = 15;
+	rightPaddle.paddle.h = HEIGHT / 6;
+	rightPaddle.verticalHalfSize = HEIGHT / 12;
+	rightPaddle.paddle.x = WIDTH - 100;
+	rightPaddle.paddle.y = rightPaddle.Yposition;
+	//rightPaddle.paddle.y = rightPaddle.Yposition = (HEIGHT / 2) - (rightPaddle.paddle.h / 2);
 
 	ball.ball.w = SIZE - 8;
 	ball.ball.h = SIZE - 8;

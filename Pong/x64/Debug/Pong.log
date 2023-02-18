@@ -1,15 +1,14 @@
-﻿  Main.cpp
+﻿  classes.cpp
 C:\Users\Devin\source\repos\Pong\Pong\classes.cpp(52,28): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
 C:\Users\Devin\source\repos\Pong\Pong\classes.cpp(61,30): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(42,40): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(46,40): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(80,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(81,22): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(89,34): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(190,43): warning C4244: '=': conversion from 'Sint32' to 'float', possible loss of data
-C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(200,34): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-  classes.cpp
+  Main.cpp
 C:\Users\Devin\source\repos\Pong\Pong\classes.cpp(52,28): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
 C:\Users\Devin\source\repos\Pong\Pong\classes.cpp(61,30): warning C4244: '=': conversion from 'Uint64' to 'int', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(44,40): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(48,40): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(107,34): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(209,67): warning C4244: '=': conversion from 'Sint32' to 'float', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(219,34): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\Devin\source\repos\Pong\Pong\Main.cpp(226,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   Generating Code...
   Pong.vcxproj -> C:\Users\Devin\source\repos\Pong\x64\Debug\Pong.exe

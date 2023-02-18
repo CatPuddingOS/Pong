@@ -8,11 +8,14 @@ public:
 	float previousYPosition, modifiedYPosition;
 	float Xvelocity, Yvelocity;
 	float acceleration;
+	/*Experimental: adds wobble to the paddle.The lower the number the more the paddle wobbles. 
+	Can be any single decimal between 1.1 and 10*/
+	float buoyancy = 1.5;
 	SDL_Rect paddle;
 
-	void CalculateAcceleration(float, float, float);
 	float getXposition();
 	float getYposition();
+	void CalculateAcceleration(float, float, float);
 	void MovePaddle(float, float);
 	void HandleContactingWall(int);
 

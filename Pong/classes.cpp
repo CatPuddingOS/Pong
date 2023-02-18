@@ -2,6 +2,14 @@
 #include <iostream>
 #include "classes.h"
 
+inline float Paddle::getXposition()
+{
+	return Xposition;
+};
+inline float Paddle::getYposition()
+{
+	return Yposition;
+};
 inline void Paddle::CalculateAcceleration(float current, float prev, float delta)
 {
 	if (prev < current)
@@ -10,14 +18,6 @@ inline void Paddle::CalculateAcceleration(float current, float prev, float delta
 		acceleration += 100000.f * (prev - current) * delta;
 		
 	std::cout << "acc: " << acceleration << std::endl;
-};
-inline float Paddle::getXposition()
-{
-	return Xposition;
-};
-inline float Paddle::getYposition()
-{
-	return Yposition;
 };
 inline void Paddle::MovePaddle(float delta, float accel)
 {	
