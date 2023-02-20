@@ -1,12 +1,29 @@
 #pragma once
 #include <SDL.h>
+#include "class_vector.h"
+#include "class_transformation.h"
+
+class Rigid
+{
+	Rigid();
+	virtual ~Rigid();
+
+private:
+	float m_mass;
+	float m_gravity;
+};
+
 class Paddle
 {
 public:
 	float verticalHalfSize; //HalfSize also relates to TOTAL height in our case
-	float Xposition, Yposition;
-	float previousYPosition, modifiedYPosition;
-	float Xvelocity, Yvelocity;
+	DimensionalVector position;
+	DimensionalVector lastPosition;
+	DimensionalVector modifiedPosition;
+	DimensionalVector velocity;
+	//float Xposition, Yposition;
+	//float previousYPosition, modifiedYPosition;
+	//float Xvelocity, Yvelocity;
 	float acceleration;
 	/*Experimental: adds wobble to the paddle.The lower the number the more the paddle wobbles. 
 	Can be any single decimal from 1.1. Paddle has no bounce at ~4*/

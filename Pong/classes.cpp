@@ -2,10 +2,11 @@
 #include <iostream>
 #include "classes.h"
 
-inline Paddle::Paddle(float screenHeight, int side) 
+inline Paddle::Paddle(float screenHeight, int side)
 	:verticalHalfSize{ screenHeight / 12 },
-	Xposition{0.f}, Yposition{0.f}, previousYPosition{0.f}, modifiedYPosition{0.f},
-	Xvelocity{0.f}, Yvelocity{0.f},
+	position(0, 0), lastPosition(0, 0), modifiedPosition(0, 0),
+	velocity(0, 0),
+	//acceleration should be a vector
 	acceleration{0.f}
 {
 	//Working but experimental
@@ -14,35 +15,35 @@ inline Paddle::Paddle(float screenHeight, int side)
 	paddle.w = 15;
 	paddle.h = screenHeight / 6;
 	paddle.x = side;
-	paddle.y = Yposition;
+	paddle.y = position.Y;
 }
 inline Paddle::~Paddle()
 {}
 inline float Paddle::getXposition()
 {
-	return Xposition;
+	return position.X;
 };
 inline float Paddle::getYposition()
 {
-	return Yposition;
+	return position.Y;
 };
 //Match sign of acceleration to paddles displacement
 inline void Paddle::CalculateAcceleration(float delta)
 {
-	float displacement = previousYPosition - modifiedYPosition;
+	float displacement = lastPosition.Y - modifiedPosition.Y;
 
 	if (displacement > 0)
-		acceleration -= 50000.f * (modifiedYPosition - previousYPosition) * delta;
+		acceleration -= 50000.f * (modifiedPosition.Y - lastPosition.Y) * delta;
 	else if (displacement < 0)
-		acceleration += 50000.f * (previousYPosition - modifiedYPosition) * delta;
+		acceleration += 50000.f * (lastPosition.Y - modifiedPosition.Y) * delta;
 		
 	std::cout << "acc: " << acceleration << std::endl;
 };
 inline void Paddle::ApplyPhysics(float delta)
 {	
-	/*calculating friction*/acceleration -= Yvelocity * 10.f;
-	/*the next y position*/Yposition += (Yvelocity * delta) + (.5f * acceleration * delta * delta);
-	/*Final velocity*/Yvelocity += acceleration * delta;
+	/*calculating friction*/acceleration -= velocity.Y * 10.f;
+	/*the next y position*/position.Y += (velocity.Y * delta) + (.5f * acceleration * delta * delta);
+	/*Final velocity*/velocity.Y += acceleration * delta;
 }
 inline void Paddle::MovePaddle(float delta)
 {
@@ -52,13 +53,13 @@ inline void Paddle::MovePaddle(float delta)
     //For slide
 	//acceleration = 0;
 	//Position with no values applied
-	Yposition = (float)modifiedYPosition;
+	position.Y = modifiedPosition.Y;
 	//Physics calculations
 	CalculateAcceleration(delta);
 	//Augment the next position
 	ApplyPhysics(delta);
 	//Done with current position edit
-	previousYPosition = modifiedYPosition;
+	lastPosition.Y = modifiedPosition.Y;
 
 
 }
@@ -66,18 +67,18 @@ inline void Paddle::HandleContactingWall(int collisionArea)
 {
 	if (collisionArea >= 895)
 	{
-		Yposition = collisionArea - verticalHalfSize;
+		position.Y = collisionArea - verticalHalfSize;
 	}
 	else if (collisionArea <= 5)
 	{
-		Yposition = collisionArea + verticalHalfSize;
+		position.Y = collisionArea + verticalHalfSize;
 	}
-	Yvelocity = 0; acceleration = 0;
+	velocity.Y = 0; acceleration = 0;
 }
 /*---DEBUG---*/
 inline void Paddle::printMovementValues()
 {
-	std::cout << "A: " << acceleration << " # # # V: " << Yvelocity << " # # # P: " << Yposition << " | ";
+	std::cout << "A: " << acceleration << " # # # V: " << velocity.Y << " # # # P: " << position.Y << " | ";
 }
 
 /*BALL*/

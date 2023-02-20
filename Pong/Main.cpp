@@ -2,6 +2,7 @@
 #include <iostream>
 #include "classes.cpp"
 #include "input_tracker.h"
+#include "class_vector.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080
@@ -38,8 +39,8 @@ void debugInfo()
 
 void CollisionCheck(Paddle &p)
 {
-	float paddleBottomLimit = p.Yposition + p.verticalHalfSize;
-	float paddleTopLimit = p.Yposition - p.verticalHalfSize;
+	float paddleBottomLimit = p.position.Y + p.verticalHalfSize;
+	float paddleTopLimit = p.position.Y - p.verticalHalfSize;
 	if (paddleTopLimit < court.topBoundary)
 	{
 		p.HandleContactingWall(court.topBoundary);
@@ -53,19 +54,19 @@ void CollisionCheck(Paddle &p)
 //This corrects the mouses' relative position if it strays from the play area. Keeps paddle motion stable when colliding with a border
 void CorrectRelativeBoundary(Paddle &paddle)
 {
-	if (paddle.modifiedYPosition > 815)
+	if (paddle.modifiedPosition.Y > 815)
 	{
-		paddle.modifiedYPosition = 815;
+		paddle.modifiedPosition.Y = 815;
 	}
-	if (paddle.modifiedYPosition < 90)
+	if (paddle.modifiedPosition.Y < 90)
 	{
-		paddle.modifiedYPosition = 90;
+		paddle.modifiedPosition.Y = 90;
 	}
 }
 
 void Update()
 {
-	if (hasInput.mouseMoving && leftPaddle.previousYPosition == leftPaddle.modifiedYPosition)
+	if (hasInput.mouseMoving && leftPaddle.lastPosition.Y == leftPaddle.modifiedPosition.Y)
 	{
 		hasInput.mouseMoving = false;
 	}
@@ -91,7 +92,7 @@ void Update()
 	CollisionCheck(leftPaddle);
 
 	//Apply edited Yposition to rendered paddle
-	leftPaddle.paddle.y = leftPaddle.Yposition;
+	leftPaddle.paddle.y = leftPaddle.position.Y;
 	CorrectRelativeBoundary(leftPaddle);
 
 	//std::cout << "Relative Info: " << modifiedYPosition << " " << previousYPosition << " ";
@@ -146,7 +147,7 @@ void Input()
 			break;
 		case SDL_MOUSEMOTION:
 			hasInput.mouseMoving = true;
-			leftPaddle.modifiedYPosition += e.motion.yrel;
+			leftPaddle.modifiedPosition.Y += e.motion.yrel;
 			e.motion.yrel -= e.motion.yrel;
 			break;
 		default:	break;
@@ -194,7 +195,7 @@ int main(int argc, char* argv[])
 	event.type = SDL_MOUSEMOTION;
 
 	//Helping to create an illusion of falling from the top on spawn
-	leftPaddle.Yposition = event.motion.yrel = HEIGHT / 3;
+	leftPaddle.position.Y = event.motion.yrel = HEIGHT / 3;
 	//rightPaddle.Yposition = event.motion.yrel = HEIGHT / 3;
 	SDL_PushEvent(&event);
 	//Create color (white)

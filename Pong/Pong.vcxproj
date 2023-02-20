@@ -133,6 +133,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="classes.h" />
+    <ClInclude Include="class_transformation.h" />
+    <ClInclude Include="class_vector.h" />
     <ClInclude Include="input_tracker.h" />
   </ItemGroup>
   <ItemGroup>
