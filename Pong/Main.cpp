@@ -8,23 +8,23 @@
 
 #define SIZE 16;
 
+enum ScreenSide
+{
+	LEFT = 100,
+	RIGHT = WIDTH - 100
+};
+
 SDL_Renderer* renderer;
 SDL_Window* window;
 SDL_Color color;
+DeltaFrames deltaFrame;
 InputTracker hasInput;
 bool running = false;
 
-/*frameCount to delta  could probably be in s struct or class somewhere*/
-int frameCount, timerFPS, thisFrame, lastFrame, fps;
-float deltaTime;
-
-/*previous and modified potsition need to be in a class as: pervious and new*/
-float previousYPosition = 0.f;
-int modifiedYPosition = 0;
-
-/*Objects must stay for now*/
-Paddle leftPaddle;
-Paddle rightPaddle;
+Paddle leftPaddle(HEIGHT, LEFT);
+Paddle rightPaddle(HEIGHT, RIGHT);
+//Array of all paddle objects. For loops hate him, see how this one simple trick ruined the movement algorithm.
+Paddle paddles[] = {leftPaddle, rightPaddle};
 Ball ball;
 Court court;
 
@@ -36,68 +36,69 @@ void debugInfo()
 	std::cout << std::endl;
 }
 
-void CollisionCheck()
+void CollisionCheck(Paddle &p)
 {
-	float paddleBottomLimit = leftPaddle.Yposition + leftPaddle.verticalHalfSize;
-	float paddleTopLimit = leftPaddle.Yposition - leftPaddle.verticalHalfSize;
+	float paddleBottomLimit = p.Yposition + p.verticalHalfSize;
+	float paddleTopLimit = p.Yposition - p.verticalHalfSize;
 	if (paddleTopLimit < court.topBoundary)
 	{
-		leftPaddle.HandleContactingWall(court.topBoundary);
+		p.HandleContactingWall(court.topBoundary);
 	}
 	else if (paddleBottomLimit > court.bottomBoundary)
 	{
-		leftPaddle.HandleContactingWall(court.bottomBoundary);
+		p.HandleContactingWall(court.bottomBoundary);
 	}
 }
 
-//This corrects the mouses' relative position if it strays from the play area. Keeps paddle motion stable
-void correctRelativeBoundary()
+//This corrects the mouses' relative position if it strays from the play area. Keeps paddle motion stable when colliding with a border
+void CorrectRelativeBoundary(Paddle &paddle)
 {
-	if (modifiedYPosition > 815)
+	if (paddle.modifiedYPosition > 815)
 	{
-		modifiedYPosition = 815;
+		paddle.modifiedYPosition = 815;
 	}
-	if (modifiedYPosition < 90)
+	if (paddle.modifiedYPosition < 90)
 	{
-		modifiedYPosition = 90;
+		paddle.modifiedYPosition = 90;
 	}
 }
 
 void Update()
 {
-	if (hasInput.mouseMoving)
+	if (hasInput.mouseMoving && leftPaddle.previousYPosition == leftPaddle.modifiedYPosition)
 	{
 		hasInput.mouseMoving = false;
 	}
-	/*MOVEMENT PHYSICS ON BUTTON PRESS
-	//if (keyDown.wPressed) { leftPaddle.incrimentAcceleration('+'); }
-	//if (keyDown.sPressed) { leftPaddle.incrimentAcceleration('-'); }
-	//leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
-	//leftPaddle.acceleration = 0.f;*/
 
-	//Unedited position
-	leftPaddle.Yposition = (float)modifiedYPosition;
+	/*****Wanting to throw a foreach in here but the paddle array doesn't play nice with those for some reason.
+	It's as if none of the functions in the loop are firing for either object on call.*****/
+	/*FIX: Objects need to be passed by ref not as stale date*/
 
-	/*MOVEMENT PHYSICS ON MOUSEMOVE*/
-	if (previousYPosition < modifiedYPosition) { leftPaddle.incrimentAcceleration('+'); }
-	if (previousYPosition > modifiedYPosition) { leftPaddle.incrimentAcceleration('-'); }
-	previousYPosition = modifiedYPosition;
+	//for (Paddle p : paddles)
+	//{
+	//	//Everything under this works when not in a for loop
+	//	/*LEFT PADDLE MOUSE*/
+	//	p.MovePaddle(deltaFrame.deltaTime);
+	//	CollisionCheck();
 
-	leftPaddle.movePaddle(deltaTime, leftPaddle.acceleration);
-	leftPaddle.acceleration = 0;
-	
-	CollisionCheck();
+	//	//Apply edited Yposition to rendered paddle
+	//	p.paddle.y = p.Yposition;
+	//	CorrectRelativeBoundary(p);
+	//}
 
-	//Apply edited Yposition
+	/*LEFT PADDLE MOUSE*/
+	leftPaddle.MovePaddle(deltaFrame.deltaTime);
+	CollisionCheck(leftPaddle);
+
+	//Apply edited Yposition to rendered paddle
 	leftPaddle.paddle.y = leftPaddle.Yposition;
-	correctRelativeBoundary();
+	CorrectRelativeBoundary(leftPaddle);
 
-
-
-	/*std::cout << "Relative Info: " << modifiedYPosition << " " << previousYPosition << " ";
-	debugInfo();*/
+	//std::cout << "Relative Info: " << modifiedYPosition << " " << previousYPosition << " ";
+	//debugInfo();
 }
 
+/*Probably gonna use this later*/
 void MouseInput()
 {
 	SDL_Event e;
@@ -126,16 +127,13 @@ void Input()
 	{
 		switch (e.type)
 		{
-		case SDL_QUIT:
-			running = false;
-			break;
+		case SDL_QUIT:	running = false; break;
 		case SDL_KEYDOWN:
 			switch (e.key.keysym.sym)
 			{
 			case SDLK_w:	hasInput.wPressed = true; break;
 			case SDLK_s:	hasInput.sPressed = true; break;
-			default:
-				break;
+			default:	break;
 			}
 			break;
 		case SDL_KEYUP:
@@ -143,17 +141,15 @@ void Input()
 			{
 			case SDLK_w:	hasInput.wPressed = false; break;
 			case SDLK_s:	hasInput.sPressed = false; break;
-			default:
-				break;
+			default:	break;
 			}
 			break;
 		case SDL_MOUSEMOTION:
 			hasInput.mouseMoving = true;
-			modifiedYPosition += e.motion.yrel;
+			leftPaddle.modifiedYPosition += e.motion.yrel;
 			e.motion.yrel -= e.motion.yrel;
 			break;
-		default:
-			break;
+		default:	break;
 		}
 
 		if (keyStates[SDL_SCANCODE_ESCAPE])
@@ -170,12 +166,8 @@ void Render()
 	SDL_RenderClear(renderer);
 
 	//Recheck Frame Count (Delta)
-	frameCount++;
-	timerFPS = SDL_GetTicks64() - lastFrame;
-	if (timerFPS < (1000 / 60))
-	{
-		SDL_Delay((1000 / 60) - timerFPS);
-	}
+	deltaFrame.SetNextTimerFPS();
+	deltaFrame.FPSThrottle();
 
 	//Colorize Viewport (Queue)
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
@@ -200,23 +192,13 @@ int main(int argc, char* argv[])
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 	SDL_Event event;
 	event.type = SDL_MOUSEMOTION;
-	event.motion.yrel = HEIGHT / 2 - (leftPaddle.paddle.h / 2);
-	SDL_PushEvent(&event);
 
+	//Helping to create an illusion of falling from the top on spawn
+	leftPaddle.Yposition = event.motion.yrel = HEIGHT / 3;
+	//rightPaddle.Yposition = event.motion.yrel = HEIGHT / 3;
+	SDL_PushEvent(&event);
 	//Create color (white)
 	color.r = color.g = color.b = 255;
-
-	leftPaddle.paddle.w = 15;
-	leftPaddle.paddle.h = HEIGHT / 6;
-	leftPaddle.verticalHalfSize = HEIGHT / 12;
-	leftPaddle.paddle.x = 100;
-	leftPaddle.paddle.y = leftPaddle.Yposition = (HEIGHT / 2) - (leftPaddle.paddle.h / 2);
-
-	/*rightPaddle.rightPaddle.w = 15;
-	rightPaddle.rightPaddle.h = HEIGHT / 6;
-	ritghPaddle.verticalHalfSize = HEIGHT / 12;
-	rightPaddle.rightPaddle.x = WIDTH - 100;
-	rightPaddle.rightPaddle.y = rightPaddle.Yposition = (HEIGHT / 2) - (rightPaddle.rightPaddle.h / 2)*/;
 
 	ball.ball.w = SIZE - 8;
 	ball.ball.h = SIZE - 8;
@@ -229,19 +211,14 @@ int main(int argc, char* argv[])
 
 	while (running)
 	{
-		lastFrame = SDL_GetTicks64();
-		if (lastFrame >= (lastTime + 1000))
-		{
-			lastTime = lastFrame;
-		}
+		deltaFrame.CheckNewFrame(lastTime);
 
 		Update();
 		Input();
 		//MouseInput();
 		Render();
 
-		deltaTime = (SDL_GetTicks() - lastFrame) / 1000.f;
-		//deltaTime = (float)((SDL_GetTicks64() - lastFrame) * 1000.f / (float)SDL_GetPerformanceFrequency());
+		deltaFrame.CalculateDelta();
 	}
 
 	SDL_DestroyRenderer(renderer);
